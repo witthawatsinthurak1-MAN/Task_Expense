@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbwti8YByLsLGxtqcgu4tqt6I1_FWaOh8KLrxq8vAll725jZdX0SLAM9sk_nZ7aW0xfz/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzwmVc7c6skjtJzzPGtRArpSduBxtHpxacSOL7V1aeKEXAl_xYCpi5aeeR_AHNntyO5/exec";
 
 document.addEventListener('DOMContentLoaded', function () {
     if (localStorage.getItem('currentUser')) {
