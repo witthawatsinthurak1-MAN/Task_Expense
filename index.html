@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task & Expense System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FullCalendar CSS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- 🔐 ส่วนระบบ Login / Register -->
+    <div id="authContainer" class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card shadow-sm p-4" style="width: 400px;">
+            <h3 class="text-center mb-4" id="authTitle">เข้าสู่ระบบ</h3>
+            
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" id="loginUser" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="loginPass" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3">เข้าสู่ระบบ</button>
+                <p class="text-center">ยังไม่มีบัญชี? <a href="#" onclick="toggleAuth(true)">สมัครสมาชิก</a></p>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="d-none">
+                <div class="mb-3">
+                    <label class="form-label">ชื่อ-นามสกุล</label>
+                    <input type="text" class="form-control" id="regName" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" id="regUser" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="regPass" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100 mb-3">ยืนยันการสมัคร</button>
+                <p class="text-center">มีบัญชีอยู่แล้ว? <a href="#" onclick="toggleAuth(false)">เข้าสู่ระบบ</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- 📊 ส่วนของแดชบอร์ดหลัก -->
+    <div id="appContainer" class="d-none">
+        <nav class="navbar navbar-dark bg-dark shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><i class="fas fa-wallet me-2"></i>Task & Expense System</a>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()"><i class="fas fa-sign-out-alt me-1"></i>ออกจากระบบ</button>
+            </div>
+        </nav>
+
+        <div class="container my-4">
+            <!-- Summary Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-primary text-white shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">รายรับรวม</h5>
+                            <h3 id="totalIncome">0.00 ฿</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-danger text-white shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">รายจ่ายรวม</h5>
+                            <h3 id="totalExpense">0.00 ฿</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-success text-white shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">ยอดคงเหลือ</h5>
+                            <h3 id="netBalance">0.00 ฿</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Forms Section -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white fw-bold">➕ เพิ่มงานใหม่</div>
+                        <div class="card-body">
+                            <form id="taskForm">
+                                <div class="mb-3"><label class="form-label">ชื่องาน</label><input type="text" class="form-control" id="taskTitle" required></div>
+                                <div class="mb-3"><label class="form-label">รายละเอียด</label><textarea class="form-control" id="taskDesc" rows="2"></textarea></div>
+                                <div class="mb-3"><label class="form-label">กำหนดส่ง</label><input type="date" class="form-control" id="taskDueDate" required></div>
+                                <button type="submit" class="btn btn-primary w-100">บันทึกงาน</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white fw-bold">💰 เพิ่มรายรับ-รายจ่าย</div>
+                        <div class="card-body">
+                            <form id="txForm">
+                                <div class="mb-3">
+                                    <label class="form-label">ประเภท</label>
+                                    <select class="form-select" id="txType"><option value="Income">รายรับ</option><option value="Expense">รายจ่าย</option></select>
+                                </div>
+                                <div class="mb-3"><label class="form-label">หมวดหมู่</label><input type="text" class="form-control" id="txCategory" required></div>
+                                <div class="mb-3"><label class="form-label">จำนวนเงิน</label><input type="number" step="0.01" class="form-control" id="txAmount" required></div>
+                                <div class="mb-3"><label class="form-label">วันที่</label><input type="date" class="form-control" id="txDate" required></div>
+                                <button type="submit" class="btn btn-success w-100">บันทึกธุรกรรม</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Section -->
+                <div class="col-lg-8">
+                    <div class="card shadow-sm p-3">
+                        <h5 class="mb-3 text-secondary"><i class="fas fa-calendar-alt me-2"></i>ปฏิทินงาน</h5>
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+    <script src="app.js"></script>
+</body>
+</html>
